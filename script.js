@@ -8,7 +8,7 @@ class Workout {
   date = new Date();
   id = (Date.now() + '').slice(-10);
   clicks = 0;
-  constructor (coords, distance, duration) {
+  constructor(coords, distance, duration) {
     this.coords = coords; // [lat, lng]
     this.distance = distance; // in km
     this.duration = duration; // in min
@@ -16,9 +16,9 @@ class Workout {
 
   _setDescription() {
     // prettier-ignore
-    const months = [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ];
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-    this.description = `${ this.type[ 0 ].toUpperCase() }${ this.type.slice(1) } on ${ months[ this.date.getMonth() ] } ${ this.date.getDate() }`;
+    this.description = `${this.type[0].toUpperCase()}${this.type.slice(1)} on ${months[this.date.getMonth()]} ${this.date.getDate()}`;
   }
 
   click() {
@@ -28,7 +28,7 @@ class Workout {
 
 class Running extends Workout {
   type = 'running';
-  constructor (coords, distance, duration, cadence) {
+  constructor(coords, distance, duration, cadence) {
     super(coords, distance, duration);
     this.cadence = cadence;
     this.calcPace();
@@ -44,7 +44,7 @@ class Running extends Workout {
 
 class Cycling extends Workout {
   type = 'cycling';
-  constructor (coords, distance, duration, elevationGain) {
+  constructor(coords, distance, duration, elevationGain) {
     super(coords, distance, duration);
     this.elevationGain = elevationGain;
     this.calcSpeed();
@@ -76,7 +76,7 @@ class App {
   #mapZoomLevel = 13;
   #mapEvent;
   #workouts = []; // new empty array to store the workouts
-  constructor () {
+  constructor() {
     // Get map position on map
     this._getPosition();
 
@@ -102,14 +102,24 @@ class App {
     const { latitude } = position.coords;
     const { longitude } = position.coords;
 
-    const coords = [ latitude, longitude ];
+    const coords = [latitude, longitude];
+    console.log("Loading map...");
+    console.log(this); // Should be an instance of App
+    console.log(document.getElementById('map')); // Should not be null
 
-    console.log(this);
+    // console.log(this);
+    console.log(document.getElementById('map')); // Should not be null
+
     this.#map = L.map('map').setView(coords, this.#mapZoomLevel); // TypeError: Cannot set properties of undefined (setting '#map')
 
-    L.tileLayer('https://tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    // L.tileLayer('https://tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+    //   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    // }).addTo(this.#map);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
     }).addTo(this.#map);
+
 
     // Handling clicks on map
     this.#map.on('click', this._showForm.bind(this));
@@ -118,6 +128,7 @@ class App {
       this._renderWorkoutMarker(work);
     });
   }
+
   _showForm(mapE) {
     this.#mapEvent = mapE;
     form.classList.remove('hidden');
@@ -166,7 +177,7 @@ class App {
       )
         return alert('Inputs have to be positive numbers!');
 
-      workout = new Running([ lat, lng ], distance, duration, cadence);
+      workout = new Running([lat, lng], distance, duration, cadence);
     }
     // If workout is  cycling, create cycling  object
     if (type === 'cycling') {
@@ -176,7 +187,7 @@ class App {
         !allPositive(distance, duration))
         return alert('Inputs have to be positive numbers!');
 
-      workout = new Cycling([ lat, lng ], distance, duration, elevation);
+      workout = new Cycling([lat, lng], distance, duration, elevation);
     }
 
     // Add new object to workouts array
@@ -205,24 +216,24 @@ class App {
           minWidth: 100,
           autoClose: false,
           closeOnClick: false,
-          className: `${ workout.type }-popup`
+          className: `${workout.type}-popup`
         }))
-      .setPopupContent(`${ workout.type === 'running' ? '🏃‍♂️' : '🚴‍♂️' } ${ workout.description }`)
+      .setPopupContent(`${workout.type === 'running' ? '🏃‍♂️' : '🚴‍♂️'} ${workout.description}`)
       .openPopup();
   }
 
   _renderWorkout(workout) {
     let html = `
-    <li class="workout workout--${ workout.type }" data-id="${ workout.id } ">
-      <h2 class="workout__title">${ workout.description }</h2>
+    <li class="workout workout--${workout.type}" data-id="${workout.id} ">
+      <h2 class="workout__title">${workout.description}</h2>
       <div class="workout__details">
-        <span class="workout__icon">${ workout.type === 'running' ? '🏃‍♂️' : '🚴‍♂️' } </span>
-        <span class="workout__value">${ workout.distance }</span>
+        <span class="workout__icon">${workout.type === 'running' ? '🏃‍♂️' : '🚴‍♂️'} </span>
+        <span class="workout__value">${workout.distance}</span>
         <span class="workout__unit">km</span>
       </div>
       <div class="workout__details">
         <span class="workout__icon">⏱</span>
-        <span class="workout__value">${ workout.duration }</span>
+        <span class="workout__value">${workout.duration}</span>
         <span class="workout__unit">min</span>
       </div>
     `;
@@ -231,12 +242,12 @@ class App {
       html += `
       <div class="workout__details">
         <span class="workout__icon">⚡️</span>
-        <span class="workout__value">${ workout.pace.toFixed(1) }</span>
+        <span class="workout__value">${workout.pace.toFixed(1)}</span>
         <span class="workout__unit">min/km</span>
       </div>
       <div class="workout__details">
         <span class="workout__icon">🦶🏼</span>
-        <span class="workout__value">${ workout.cadence }</span>
+        <span class="workout__value">${workout.cadence}</span>
         <span class="workout__unit">spm</span>
       </div>
     </li>
@@ -247,12 +258,12 @@ class App {
       html += `
       <div class="workout__details">
         <span class="workout__icon">⚡️</span>
-        <span class="workout__value">${ workout.speed.toFixed(1) }</span>
+        <span class="workout__value">${workout.speed.toFixed(1)}</span>
         <span class="workout__unit">km/h</span>
       </div>
       <div class="workout__details">
         <span class="workout__icon">⛰</span>
-        <span class="workout__value">${ workout.elevationGain }</span>
+        <span class="workout__value">${workout.elevationGain}</span>
         <span class="workout__unit">m</span>
           </div>
     </li>
@@ -260,7 +271,6 @@ class App {
 
     form.insertAdjacentHTML('afterend', html);
   }
-
 
   /// Move to Marker On Click///
   _moveToPopup(e) {
@@ -279,7 +289,7 @@ class App {
     });
   }
 
- /// localStorage///
+  /// localStorage///
   _setLocalStorage() {
     localStorage.setItem('workouts', JSON.stringify(this.#workouts));
   }
